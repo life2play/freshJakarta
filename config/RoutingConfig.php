@@ -24,6 +24,15 @@ class RoutingConfig extends RoutingEngine {
       ),
     );
 
+    $table['backend'] = array(
+      'cron-getdata' => array(
+        self::PAGE => 'Cron/get',
+      ),
+      'cron-geteta' => array(
+        self::PAGE => 'Cron/eta',
+      ),
+    );
+
     /* application path map */
     $map = array(
         '/' => 'frontend',
