@@ -1,0 +1,47 @@
+<?php
+
+namespace PetakUmpet;
+
+// class as configurator
+
+class Config extends ConfigEngine {
+
+  public function __construct()
+  {
+    /* project environment setup */
+    $this->projectTitle = 'Application Title';
+    $this->loginPage    = 'Login/index';
+    $this->startPage    = 'Home/index';
+    $this->noAccessPage = 'User/noAccess';
+
+
+    $this->eventLogging = true;
+    $this->development  = true;
+    $this->logLevel     = \PetakUmpet\Logger::DEBUG;
+
+    $this->rc = new RoutingConfig; 
+
+    $this->anonPages    = array(
+        'Home/about',
+        'Home/contact',
+        'Login/index',
+        'Logout/index',
+        'User/noAccess',
+      );
+
+    $this->appsOpenState = array(
+        'frontend' => true,
+      );
+    
+    /* database configuration 
+       for multiple connection just add more index */
+    $this->dbConfig[0] = array(
+        self::DBTYPE => 'PostgreSQL',
+        self::DBHOST => 'localhost',
+        self::DBNAME => 'testdb',
+        self::DBUSER => 'testdb',
+        self::DBCRED => 'testpasswd',
+      );
+  }
+
+}
