@@ -48,7 +48,9 @@ class CronApplication extends Application {
     // some sort of safety measurement
     if ($_SERVER['REMOTE_ADDR'] != 'localhost' && 
           $_SERVER['REMOTE_ADDR'] != '127.0.0.1' &&
-            $_SERVER['REMOTE_ADDR'] != '119.235.24.92') {
+            $_SERVER['REMOTE_ADDR'] != '119.235.24.90' &&
+              $_SERVER['REMOTE_ADDR'] != '119.235.24.92'
+              ) {
       echo (string) 'No Result';
       exit();
     }
