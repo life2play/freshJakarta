@@ -20,21 +20,23 @@ class CronApplication extends Application {
     $relTable = array();
 
     $n=0;
-    $result = $jsonData->$key;
-    foreach ($result as $row) {
-      foreach ($row as $k=>$v) {
-        $kval = strtolower($k);
-        // recurse 1 step if found an array (not recursive yet)
-        if (is_array($v)) {
-          $relTable[$n][$kval] = array();
-          foreach ($v as $vv) {
-            $relTable[$n][$kval][] = $vv;
+    if (property_exists($jsonData, $key)) {
+      $result = $jsonData->$key;
+      foreach ($result as $row) {
+        foreach ($row as $k=>$v) {
+          $kval = strtolower($k);
+          // recurse 1 step if found an array (not recursive yet)
+          if (is_array($v)) {
+            $relTable[$n][$kval] = array();
+            foreach ($v as $vv) {
+              $relTable[$n][$kval][] = $vv;
+            }
+          } else { // otherwise put it in
+            $data[$n][$kval]=$v;
           }
-        } else { // otherwise put it in
-          $data[$n][$kval]=$v;
         }
+        $n++;
       }
-      $n++;
     }
 
     return array($data, $relTable);
@@ -72,18 +74,22 @@ class CronApplication extends Application {
     list($halteData, $relTable) = $this->jsonToArr($jsonData, 'result_halte');
     list($busData, $relTable) = $this->jsonToArr($jsonData, 'result');
 
-    $model = new Model('busway_eta_halte');
-    foreach ($halteData as $row) {
-      $row['srchalte'] = $srchalte;
-      $row['checktime'] = $checktime;
-      $model->save($row);
+    if (count($halteData) > 0) {
+      $model = new Model('busway_eta_halte');
+      foreach ($halteData as $row) {
+        $row['srchalte'] = $srchalte;
+        $row['checktime'] = $checktime;
+        $model->save($row);
+      }
     }
 
-    $model = new Model('busway_eta_bus');
-    foreach ($busData as $row) {
-      $row['srchalte'] = $srchalte;
-      $row['checktime'] = $checktime;
-      $model->save($row);
+    if (count($busData) > 0) {
+      $model = new Model('busway_eta_bus');
+      foreach ($busData as $row) {
+        $row['srchalte'] = $srchalte;
+        $row['checktime'] = $checktime;
+        $model->save($row);
+      }
     }
 
     return $this->renderView('Cron/get');
