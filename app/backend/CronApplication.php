@@ -7,36 +7,30 @@ use PetakUmpet\Database\Model;
 
 class CronApplication extends Application {
 
-  private function getJsonData()
+  private function getJsonFromURL($url)
   {
-    $url = $this->request->get('url');
-    $resvar = null;
-    if ($this->request->get('resvar') !== null) {
-      $resvar = $this->request->get('resvar');
-    }
-
+    // todo, check for valid URL
     $content = file_get_contents($url);
-    $arr = json_decode($content);
+    return json_decode($content);
+  }
 
+  private function jsonToArr($jsonData, $key)
+  {
     $data = array();
     $relTable = array();
 
     $n=0;
-    if ($resvar !== null) {
-      $result = $arr->$resvar;
-    } else {
-      $result = $arr->result;
-    }
-
+    $result = $jsonData->$key;
     foreach ($result as $row) {
       foreach ($row as $k=>$v) {
         $kval = strtolower($k);
+        // recurse 1 step if found an array (not recursive yet)
         if (is_array($v)) {
           $relTable[$n][$kval] = array();
           foreach ($v as $vv) {
             $relTable[$n][$kval][] = $vv;
           }
-        } else {
+        } else { // otherwise put it in
           $data[$n][$kval]=$v;
         }
       }
@@ -58,16 +52,37 @@ class CronApplication extends Application {
     }
   }
 
+  private function processRuteBerangkat($data) 
+  {
+    $model = new Model('rute_berangkat');
+    foreach ($data as $v) {
+      $r['halte'] = $v;
+      $model->save($r);
+    }
+  }
+
   public function etaAction()
   {
     $this->blockOutside();
-    $table = 'busway_eta';
-    $systime = $this->request->get('systime');
-    list($data, $relTable) = $this->getJsonData();
+    $url = $this->request->get('url');
+    $checktime = $this->request->get('checktime');
+    $srchalte = $this->request->get('srchalte');
 
-    $model = new Model($table);
-    foreach ($data as $row) {
-      $row['system_check_time'] = $systime;
+    $jsonData = $this->getJsonFromURL($url);
+    list($halteData, $relTable) = $this->jsonToArr($jsonData, 'result_halte');
+    list($busData, $relTable) = $this->jsonToArr($jsonData, 'result');
+
+    $model = new Model('busway_eta_halte');
+    foreach ($halteData as $row) {
+      $row['srchalte'] = $srchalte;
+      $row['checktime'] = $checktime;
+      $model->save($row);
+    }
+
+    $model = new Model('busway_eta_bus');
+    foreach ($busData as $row) {
+      $row['srchalte'] = $srchalte;
+      $row['checktime'] = $checktime;
       $model->save($row);
     }
 
@@ -77,13 +92,27 @@ class CronApplication extends Application {
   public function getAction()
   {
     $this->blockOutside();
+    $this->blockOutside();
+    $url = $this->request->get('url');
+    $checktime = $this->request->get('checktime');
     $table = $this->request->get('table');
-    list($data, $relTable) = $this->getJsonData();
 
+    $jsonData = $this->getJsonFromURL($url);
+    list($halteData, $relTable) = $this->jsonToArr($jsonData, 'result');
+    
     $model = new Model($table);
-    foreach ($data as $row) {
+    foreach ($halteData as $row) {
       $model->save($row);
     }
+
+    // if (count($relTable) > 0) {
+    //   foreach ($relTable as $k => $rows) {
+    //     $fname = 'process' . ucfirst($k);
+    //     if (is_callable(array($this, $fname))) {
+    //       call_user_func(array($this, $fname), $rows);
+    //     }
+    //   }
+    // }
 
     return $this->render();
   }
