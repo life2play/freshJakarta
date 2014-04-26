@@ -8,12 +8,29 @@ class HomeApplication extends Application {
 
   public function indexAction()
   {
-    return $this->render();
+    $form = new Form\SearchForm;
+
+    if ($this->request->isPost()) {
+
+      if ($form->bindValidate($this->request)) {
+
+        $search = new AppUser($form->getFieldValue('start'), $form->getFieldValue('end'));
+
+        if ($search->validate()) {
+          
+
+          $this->redirect('Home/dashboard');
+        }
+        // failed login
+        $this->session->setFlash('wrong input.');
+      }
+    }
+
+    return $this->render(array('form' => $form));;
   }
 
   public function aboutAction()
   {
-    $this->request->setSubNavMenu(false);
     return $this->render();
   }
 }

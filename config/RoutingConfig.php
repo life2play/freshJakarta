@@ -14,8 +14,8 @@ class RoutingConfig extends RoutingEngine {
       'home-index' => array(
         self::PAGE => 'Home/index',
       ),
-      'support' => array(
-        self::PAGE => 'Home/support',
+      'rute' => array(
+        self::PAGE => 'Rute/edit',
       ),
 
       /* if one wants to customize their 404 page, set like this */
