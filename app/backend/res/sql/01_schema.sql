@@ -111,3 +111,26 @@ CREATE TABLE rute_kembali (
   PRIMARY KEY (id),
   FOREIGN KEY (trayek_id) REFERENCES trayek(id)
 );
+
+
+CREATE TABLE apbd_collections (
+  id serial,
+  year int,
+  unit varchar(200),
+  SKPDNama varchar(200),
+  urusan varchar(200), 
+  namaUrusan varchar(200),
+  program varchar(200),
+  namaProgram varchar(200),
+  noKegiatan varchar(200),
+  namaKegiatan varchar(200),
+  nilai varchar(200),
+  kegiatanId varchar(200),
+  SKPDKode2013 varchar(200),
+  programKode varchar(200),
+  realisasi varchar(200),
+  persenRealisasi varchar(200),
+  fisik varchar(100),
+  idproj varchar(200),
+  PRIMARY KEY (id)
+);

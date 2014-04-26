@@ -11,55 +11,6 @@ CREATE TABLE userdata (
   FOREIGN KEY (parent_id) REFERENCES userdata (id)
 );
 
-CREATE TABLE user_profile (
-  id serial,
-  user_id integer,
-  address text,
-  email varchar(255),
-  PRIMARY KEY (id),
-  FOREIGN KEY (user_id) REFERENCES userdata (id)
-);
-
-CREATE TABLE roledata (
-  id serial,
-  name varchar(50),
-  PRIMARY KEY (id)
-);
-
-CREATE TABLE accessdata (
-  id serial,
-  name varchar(255),
-  type varchar(50),
-  PRIMARY KEY (id)
-);
-
-CREATE TABLE user_role (
-  id serial,
-  user_id integer,
-  role_id integer,
-  PRIMARY KEY (id),
-  FOREIGN KEY (user_id) REFERENCES userdata (id),
-  FOREIGN KEY (role_id) REFERENCES roledata (id)
-);
-
-CREATE TABLE role_access (
-  id serial,
-  role_id integer,
-  access_id integer,
-  PRIMARY KEY (id),
-  FOREIGN KEY (role_id) REFERENCES roledata (id),
-  FOREIGN KEY (access_id) REFERENCES accessdata (id)
-);
-
-CREATE TABLE user_access (
-  id serial,
-  user_id integer,
-  access_id integer,
-  PRIMARY KEY (id),
-  FOREIGN KEY (user_id) REFERENCES userdata (id),
-  FOREIGN KEY (access_id) REFERENCES accessdata (id)
-);
-
 CREATE TABLE event (
   id serial,
   user_id integer,
@@ -72,3 +23,16 @@ CREATE TABLE event (
   FOREIGN KEY (user_id) REFERENCES userdata (id)
 );
 
+CREATE TABLE table_fusion (
+  id serial,
+  type varchar(100),
+  parent integer,
+  name varchar(100),
+  tablename varchar(100),  
+  cols varchar(100),
+  PRIMARY KEY (id)
+  --FOREIGN KEY (parent) REFERENCES table_fusion (id)
+);
+
+insert into table_fusion (type, parent, name, tablename, cols) values ('krl',0,'Rute KRL Jabodetabek','1FVon3sWp6JKXrIqKBiHlaxPAoAO-EKJsef7Rv9c','col2');
+insert into table_fusion (type, parent, name, tablename, cols) values ('transjakarta', 0,'Rute Transjakarta','1HWPRIE9fqiNyZZ8SIA31XE7nKKRjxWjooAUC-6','col3');

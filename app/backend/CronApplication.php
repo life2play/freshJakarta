@@ -98,6 +98,28 @@ class CronApplication extends Application {
     return $this->renderView('Cron/get');
   }
 
+  public function getApbdAction()
+  {
+    // $this->blockOutside();
+    $page = $this->request->get('page');
+    $year = $this->request->get('year');
+    $url = 'http://api.hackjak.bappedajakarta.go.id/apbd?apiKey=KnFKgQ2ZkS8bAvCRGMXA28RdVufck8BD&year='.$year.'&page='.$page.'&per_page=100';
+    $table = 'apbd_collections';
+
+    $jsonData = $this->getJsonFromURL($url);
+    list($halteData, $relTable) = $this->jsonToArr($jsonData, 'result');
+    
+    $model = new Model($table);
+    foreach ($halteData as $row) {
+      $row['idproj'] = $row['id'];
+      unset($row['id']);
+
+      $model->save($row);
+    }
+
+    return $this->render();
+  }
+
   public function getAction()
   {
     $this->blockOutside();
