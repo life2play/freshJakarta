@@ -6,7 +6,7 @@ use PetakUmpet\Application;
 use PetakUmpet\Singleton;
 use PetakUmpet\Database\Model;
 
-class processApplication extends Application {
+class ApiApplication extends Application {
 
   public function nearbyPointAction()
   {

@@ -57,8 +57,8 @@ class RoutingConfig extends RoutingEngine {
       ),
 
       // ---- API
-      'api-nearby-route' => array(
-        self::PAGE => 'Api/nearbyRoute', 
+      'api-nearby-point' => array(
+        self::PAGE => 'Api/nearbyPoint', 
         // list all nearby route and shelter (with busway route)
         // param q = [{lat, lon, radius}]
         // return array( array(lat, lon, type - halte/rute angkot, label) )

@@ -97,7 +97,7 @@ function getNearbyPoint()
 
   $.ajax({
     type: "GET",
-    url: "backend/get-nearby-point",
+    url: "backend/api-nearby-point",
     dataType: "json",
     data: { q: JSON.stringify(point) },
     contentType: "application/json",
