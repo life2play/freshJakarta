@@ -83,7 +83,7 @@ function findLocation(type, location, marker) {
   $('#map_canvas').gmap('search', {'location': location}, function(results, status) {
     if ( status === 'OK' ) { 
       if(type === 'a')  {
-        $('#sourcepositionlabel').html( results[0].formatted_address +'&nbsp;<img src="<?php echo $T->getResourceUrl('img/bus.png') ?>">');  
+        $('#sourcepositionlabel').html( results[0].formatted_address +'&nbsp;<img src="<?php echo $T->getResourceUrl('img/bus1.png') ?>">');  
       } else {
         $('#destinationpositionlabel').html( results[0].formatted_address  +'&nbsp;<img src="<?php echo $T->getResourceUrl('img/cabin.png') ?>">');  
       }      
