@@ -31,6 +31,9 @@ class RoutingConfig extends RoutingEngine {
       'cron-geteta' => array(
         self::PAGE => 'Cron/eta',
       ),
+      'cron-bus-distance' => array(
+        self::PAGE => 'Cron/busDistance',
+      ),
     );
 
     /* application path map */

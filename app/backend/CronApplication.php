@@ -3,6 +3,7 @@
 namespace backend;
 
 use PetakUmpet\Application;
+use PetakUmpet\Singleton;
 use PetakUmpet\Database\Model;
 
 class CronApplication extends Application {
@@ -125,5 +126,46 @@ class CronApplication extends Application {
     return $this->render();
   }
 
+  public function busDistanceAction()
+  {
+    $q = "select a.id, a.koridorno, a.halteid, b.halteid as pathdest, "
+        . "c.lat as haltelat, c.long as haltelong, a.latitude as buslat, "
+        . "a.longitude as buslong, a.eta as buseta "
+        . "from busway_eta_bus a join busway_halte b on a.koridorno = b.koridorno and a.haltename = b.haltename "
+        . "join busway_halte c on a.koridorno = c.koridorno and b.halteid = c.halteid limit 1" ;
 
+
+    $url = "origin=%s&destination=%s";
+
+    $db = Singleton::acquire("\\PetakUmpet\\Database");
+
+    $res = $db->queryFetchAll($q);
+
+    if ($res) {
+      foreach ($res as $row) {
+        $srclatlong = $row['buslat'].'%20'.$row['buslong'];
+        $dstlatlong = $row['haltelat'].'%20'.$row['haltelong'];
+
+        $req = "https://maps.googleapis.com/maps/api/directions/json?" . sprintf($url, $srclatlong, $dstlatlong). "&units=metric&sensor=false&key=AIzaSyCyL7UQogftN8YAh2JeC99y0ltxIn2cYSY";
+        $dirdata = $this->getJsonFromURL($req);
+        $routes = $dirdata->routes;
+        $distance = 0;
+        foreach($routes as $r) {
+          foreach($r->legs as $l) {
+            $distance += (int) $l->distance->value;
+          }
+        }
+        $speed = 1;
+        if (is_numeric($distance)) {
+          $speed = $distance/$row['buseta'];
+        }
+        echo $row['id'] . ' speed (meter/menit):' . $speed;
+      }
+    }
+
+  }
+
+
+// 0816 111 0808 (Sylviana Murni) Sylviana Murni@yahoo.com
+// 08111 77 0808
 }

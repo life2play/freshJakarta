@@ -1,5 +1,15 @@
 CREATE TABLE busway_halte (
   id serial,
+  halteid varchar(10),
+  haltename varchar(100),
+  koridor varchar(10),
+  lat decimal(20,15),
+  long decimal(20,15),
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE busway_halte_its (
+  id serial,
   koridorno varchar(10),
   halteid varchar(10),
   seq integer,
@@ -41,7 +51,7 @@ CREATE TABLE busway_eta_bus (
   srchalte varchar(10),
   koridorno varchar(10),
   halteid varchar(10),
-  haltename varchar(100),
+  haltename varchar(100),  -- destination halte for the bus
   busno varchar(50),
   eta integer,
   latitude decimal(20,15),
