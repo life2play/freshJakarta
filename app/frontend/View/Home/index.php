@@ -5,6 +5,7 @@
 <script language="javascript">
 var markerA = null;
 var markerB = null;
+var markerStart = null;
 var markerNearby = [];
 
 var ico_start   = '/img/start.png';
@@ -53,7 +54,6 @@ $(function() {
 }); 
 
 function setPoint(type) {  
-
   var center = $('#map_canvas').gmap('get', 'map').getCenter();
 
   if(type === 'a'){        
@@ -87,8 +87,6 @@ function setPoint(type) {
     });
   }
 
-  
-
   findLocation(type, center);
 }
 
@@ -98,7 +96,7 @@ function findLocation(type, location, marker) {
       if(type === 'a')  {
         $('#sourcepositionlabel').html( results[0].formatted_address +'<hr /><span id="ico_start"><img src="'+ico_start+'"></span><span id="ico_stop"></span>');  
       } else {
-        $('#destinationpositionlabel').html( results[0].formatted_address  +'<hr /><img src="'+ico_stop+'">');  
+        $('#destinationpositionlabel').html( results[0].formatted_address  +'<hr /><img src="'+ico_stop+'">&nbsp;<button type="button" class="btn btn-info" onclick="alert(\'x\');">Calculate route</button>');  
       }      
     }
   });  
@@ -121,12 +119,113 @@ function getNearbyPoint()
       console.log(err);
     }
   });
+
+  getNearbyRoute();
 }
 
+function getNearbyRoute()
+{  
+  // var point0 = markerA.getPosition();  
+  // var pointA = markerStart.getPosition();  
+  // var pointB = markerB.getPosition();  
+  var point = markerA.getPosition(); 
+
+  // var route = new Array();
+  // route[0] = point0;
+  // route[1] = pointA;
+  // route[2] = pointB;
+
+  $.ajax({
+    type: "GET",
+    url: "backend/api-nearby-route",
+    dataType: "json",
+    data: { q: JSON.stringify(point) },
+    contentType: "application/json",
+    success: function(data) {
+      callbackDrawRoute(data);      
+    },
+    error: function (err) {
+      console.log(err);
+    }
+  });
+}
+
+// function drawRoute(data) {
+//   map = $('#map_canvas').gmap('get', 'map');
+
+
+//   var flightPlanCoordinates = [
+//     new google.maps.LatLng(37.772323, -122.214897),
+//     new google.maps.LatLng(21.291982, -157.821856),
+//     new google.maps.LatLng(-18.142599, 178.431),
+//     new google.maps.LatLng(-27.46758, 153.027892)
+//   ];
+//   var flightPath = new google.maps.Polyline({
+//     path: flightPlanCoordinates,
+//     geodesic: true,
+//     strokeColor: '#FF0000',
+//     strokeOpacity: 1.0,
+//     strokeWeight: 2
+//   });
+
+//   flightPath.setMap(map);
+// }
+
 function callbackDraw(data) {
+  
+  var listPoint = '<strong>Pemberhentian terdekat:</strong><br /><ul>';
+
   $.each(data.result, function (i, r) {
     drawNearByPoint(r);
+    listPoint += '<li>'+r.label+'</li>';    
   });
+  listPoint += '</ul>';
+
+  $('#panInfo').empty().append(listPoint);
+}
+
+function callbackDrawRoute(data) {  
+  map = $('#map_canvas').gmap('get', 'map');
+
+  var routeAngkutan = [];  
+  var pathAngkutan = [];  
+
+  var listRoute = '<strong>Route terdekat:</strong><br /><ul>';
+  var rute = '';
+  var color = '';
+  $.each(data.result, function (i, r) {
+
+    if(rute != r.name) { 
+      color = '#'+(Math.random()*0xFFFFFF<<0).toString(16);
+      listRoute += '<li style="background: '+color+';">--- '+r.name+'</li>';       
+    }
+    drawRoute(r.name, r.type, r.routes, color);
+
+    
+    rute = r.name;
+  });  
+  listRoute += '</ul>';
+
+  $('#panInfo').append(listRoute);
+}
+
+function drawRoute(name, type, routes, color) {
+    map = $('#map_canvas').gmap('get', 'map');
+
+    var routeAngkutanPath = [];
+    $.each(routes, function(k, t) {
+      routeAngkutanPath.push(new google.maps.LatLng(t.lat, t.lng))  
+    });
+
+    var angkutanPath = new google.maps.Polyline({
+      path: routeAngkutanPath,
+      geodesic: true,
+      strokeColor: color,
+      strokeOpacity: 1.0,
+      strokeWeight: 5
+    });
+
+    angkutanPath.setMap(map);
 }
 
 function drawNearByPoint(data) {
@@ -143,7 +242,7 @@ function drawNearByPoint(data) {
       'icon': ico
     });
 
-    var button_point = '<button type="button" class="btn btn-info btn-xs" onclick="setStartPoint(\''+data.label+'\');">Set start point.</button>';
+    var button_point = '<button type="button" class="btn btn-info btn-xs" onclick="setStartPoint(\''+data.label+'\', \''+ico+'\', '+data.lat+', '+data.lng+');">Set start point.</button>';
     var infoWindow = new google.maps.InfoWindow();
     google.maps.event.addListener(marker, 'click', function () {
         infoWindow.setContent(
@@ -156,9 +255,33 @@ function drawNearByPoint(data) {
     markerNearby.push(marker);
   }
 
-function setStartPoint(label) {
-  $('#ico_stop').html('<img src="'+ico_bus+'"> '+label);
+function setStartPoint(label, ico, lat, lng) {
+  $('#ico_stop').html('<img src="'+ico+'"> '+label);
+  deleteOtherNearbyMarkers();
 
+  
+  var loc = new google.maps.LatLng(lat, lng);
+  markerStart = new google.maps.Marker({
+      position: loc,
+      map: map,
+      'animation': google.maps.Animation.DROP,
+      'icon': ico
+    });
+}
+
+function setAllMap(map) {
+  for (var i = 0; i < markerNearby.length; i++) {
+    markerNearby[i].setMap(map);
+  }
+}
+
+function clearMarkers() {
+  setAllMap(null);
+}
+
+function deleteOtherNearbyMarkers() {
+  clearMarkers();
+  markerNearby = [];
 }
 </script>
 
@@ -170,12 +293,21 @@ function setStartPoint(label) {
         <span class="input-group-addon glyphicon glyphicon-search"></span>
         <input type="text" class="form-control" placeholder="Cari lokasi di peta..." id="cari">        
       </div>      
+
       <p>&nbsp;</p>
       <div class="btn-group btn-block">
-        <button type="button" class="btn btn-danger" data-toggle="dropdown" onClick="setPoint('a');">Set berangkat</button>
-        <button type="button" class="btn btn-danger" data-toggle="dropdown" onClick="setPoint('b');">Set berhenti</button>
+        <button type="button" class="btn btn-success" data-toggle="dropdown" onClick="setPoint('a');"  style="width: 50%;">
+          Set berangkat 
+          <img src="<?php echo $T->getResourceUrl('img/start.png') ?>" class="center-block img-responsive"/>
+        </button>
+
+        <button type="button" class="btn btn-danger" data-toggle="dropdown" onClick="setPoint('b');"  style="width: 50%;">
+          Set berhenti
+          <img src="<?php echo $T->getResourceUrl('img/finish.png') ?>" class="center-block img-responsive"/>
+        </button>
       </div>
       <p>&nbsp;</p>
+      <?php /*
       <div class="btn-group btn-block ">
         <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" style="width: 100%;">
           Pencarian rute <span class="caret"></span>
@@ -198,12 +330,23 @@ function setStartPoint(label) {
           <li><a href="#">Laporan perjalanan</a></li>
           <li><a href="#">Lihat cctv</a></li>
         </ul>
-      </div>
-
+      </div>      
       <div class="btn-group btn-block">
         <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" style="width: 100%;">
           Hangout..
         </button>
+      </div>
+      */ ?>
+
+      <div class="col-md-12" style="min-height: 150px; margin-top: 10px; border: solid #000"> 
+        <div id="panInfo">
+          <ul>
+            <li>Ketikan nama tempat untuk melihat lokasi lebih jelas.</li>
+            <li>Klik Set berangkat untuk menentukan posisi</li>
+            <li>drag icon pada peta untuk posisi lebih tepat</li>
+            <li>klik icon pada peta untuk melihat pemberhentian dan rute terdekat</li>
+          </ul>
+        </div>
       </div>
     </div>    
 

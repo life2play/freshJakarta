@@ -63,6 +63,12 @@ class RoutingConfig extends RoutingEngine {
         // param q = [{lat, lon, radius}]
         // return array( array(lat, lon, type - halte/rute angkot, label) )
       ),
+      'api-nearby-route' => array(
+        self::PAGE => 'Api/nearbyRoute', 
+        // list all nearby route and shelter (with busway route)
+        // param q = [{lat, lon, radius}]
+        // return array( array(lat, lon, type - halte/rute angkot, label) )
+      ),
       'api-get-route' => array(
         self::PAGE => 'Api/getRoute', 
         // list route to be traversed
