@@ -61,6 +61,28 @@ CREATE TABLE busway_eta_bus (
   PRIMARY KEY (id)
 );
 
+CREATE TABLE busway_eta_interim_speed_distance (
+  id serial,
+  busway_eta_bus_id integer,
+  koridorno varchar(10),
+  halteid varchar(10),
+  busdistance decimal(12,4),
+  eta integer,
+  speed decimal(12,4),
+  PRIMARY KEY(id),
+  FOREIGN KEY (busway_eta_bus_id) REFERENCES busway_eta_bus(id)
+);
+
+CREATE TABLE cache_distance_query (
+  id serial,
+  srclat decimal(9,4), 
+  srclong decimal(9,4),
+  dstlat decimal(9,4),
+  dstlong decimal(9,4),
+  distance decimal(12,3),
+  PRIMARY KEY(id)
+);
+
 CREATE TABLE trayek (
   id serial,
   jenisangkutan varchar(100),
