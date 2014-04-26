@@ -1,10 +1,10 @@
 CREATE TABLE busway_halte (
   id serial,
+  koridor varchar(10),
   halteid varchar(10),
   haltename varchar(100),
-  koridor varchar(10),
-  lat decimal(20,15),
-  long decimal(20,15),
+  lat decimal(11,6),
+  long decimal(11,6),
   PRIMARY KEY (id)
 );
 
@@ -14,8 +14,8 @@ CREATE TABLE busway_halte_its (
   halteid varchar(10),
   seq integer,
   haltename varchar(100),
-  lat decimal(20,15),
-  long decimal(20,15),
+  lat decimal(11,6),
+  long decimal(11,6),
   capacity integer,
   nextdistance real,
   prevdistance real,
@@ -38,8 +38,8 @@ CREATE TABLE busway_eta_halte (
   koridorno varchar(10),
   halteid varchar(10),
   haltename varchar(100),
-  lat decimal(20,15),
-  long decimal(20,15),
+  lat decimal(11,6),
+  long decimal(11,6),
   capacity integer,
   haltetype varchar(10),
   PRIMARY KEY (id)
@@ -54,8 +54,8 @@ CREATE TABLE busway_eta_bus (
   haltename varchar(100),  -- destination halte for the bus
   busno varchar(50),
   eta integer,
-  latitude decimal(20,15),
-  longitude decimal(20,15),
+  latitude decimal(11,6),
+  longitude decimal(11,6),
   etatime varchar(50),
   bustime varchar(50),
   PRIMARY KEY (id)
@@ -75,15 +75,15 @@ CREATE TABLE busway_eta_interim_speed_distance (
 
 CREATE TABLE cache_distance_query (
   id serial,
-  srclat decimal(9,4), 
-  srclong decimal(9,4),
-  dstlat decimal(9,4),
-  dstlong decimal(9,4),
+  srclat decimal(11,6), 
+  srclong decimal(11,6),
+  dstlat decimal(11,6),
+  dstlong decimal(11,6),
   distance decimal(12,3),
   PRIMARY KEY(id)
 );
 
-CREATE TABLE trayek (
+CREATE TABLE trayek_opendata (
   id serial,
   jenisangkutan varchar(100),
   jenistrayek varchar(50),
@@ -112,7 +112,6 @@ CREATE TABLE rute_kembali (
   FOREIGN KEY (trayek_id) REFERENCES trayek(id)
 );
 
-
 CREATE TABLE apbd_collections (
   id serial,
   year int,
@@ -132,5 +131,92 @@ CREATE TABLE apbd_collections (
   persenRealisasi varchar(200),
   fisik varchar(100),
   idproj varchar(200),
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE trayek_umum (
+  id serial,
+  nama varchar(255),
+  jenis varchar(30),
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE trayek_umum_rute (
+  id serial,
+  trayek_umum_id integer,
+  type varchar(15),
+  lat decimal(11,6),
+  long decimal(11,6),
+  PRIMARY KEY (id),
+  FOREIGN KEY (trayek_umum_id) REFERENCES trayek_umum(id)
+);
+
+CREATE TABLE trayek_umum_rute_processed (
+  id serial,
+  trayek_umum_id integer,
+  type varchar(15),
+  lat decimal(11,6),
+  long decimal(11,6),
+  PRIMARY KEY (id),
+  FOREIGN KEY (trayek_umum_id) REFERENCES trayek_umum(id)
+);
+
+CREATE TABLE intersect_angkot_busway (
+  id serial,
+  trayek_umum_rute_id integer,
+  angkotlat decimal(11,6),
+  angkotlong decimal(11,6),
+  busway_halte_id integer,
+  buswaylat decimal(11,6),
+  buswaylong decimal(11,6),
+  distance double precision,
+  PRIMARY KEY (id),
+  FOREIGN KEY (trayek_umum_rute_id) REFERENCES trayek_umum_rute (id),
+  FOREIGN KEY (busway_halte_id) REFERENCES busway_halte (id)
+);
+
+CREATE TABLE intersect_busway_busway (
+  id serial,
+  src_busway_halte_id integer,
+  dst_busway_halte_id integer,
+  alat decimal(11,6),
+  along decimal(11,6),
+  blat decimal(11,6),
+  blong decimal(11,6),
+  distance double precision,
+  PRIMARY KEY (id),
+  FOREIGN KEY (src_busway_halte_id) REFERENCES busway_halte (id),
+  FOREIGN KEY (dst_busway_halte_id) REFERENCES busway_halte (id)
+);
+
+CREATE TABLE intersect_angkot_angkot (
+  id serial,
+  src_trayek_umum_id integer,
+  dst_trayek_umum_id integer,
+  alat decimal(11,6),
+  along decimal(11,6),
+  blat decimal(11,6),
+  blong decimal(11,6),
+  distance double precision,
+  PRIMARY KEY (id),
+  FOREIGN KEY (src_trayek_umum_id) REFERENCES trayek_umum (id),
+  FOREIGN KEY (dst_trayek_umum_id) REFERENCES trayek_umum (id)
+);
+
+CREATE TABLE layer_theatre (
+  id serial,
+  nama varchar(100),
+  telepon varchar(50),
+  lat decimal(11,6),
+  long decimal(11,6),
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE layer_cctv (
+  id serial,
+  nama varchar(100),
+  urladdress varchar(255),
+  lat decimal(11,6),
+  long decimal(11,6),
   PRIMARY KEY (id)
 );

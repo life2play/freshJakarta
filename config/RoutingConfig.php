@@ -46,8 +46,14 @@ class RoutingConfig extends RoutingEngine {
       'cron-geteta' => array(
         self::PAGE => 'Cron/eta',
       ),
+      'cron-busway-halte' => array(
+        self::PAGE => 'Cron/getBuswayHalte',
+      ),
       'cron-bus-distance' => array(
         self::PAGE => 'Cron/busDistance',
+      ),
+      'process-trayek-umum' => array(
+        self::PAGE => 'Process/trayek',
       ),
 
       // ---- API
