@@ -50,7 +50,7 @@ function setPoint(type) {
   if(type === 'a'){        
     if (markerA == null) {      
       map = $('#map_canvas').gmap('get', 'map');
-      markerA = new google.maps.Marker({ map: map, 'bounds': false, draggable: true, 'icon': '/img/bus.png' });
+      markerA = new google.maps.Marker({ map: map, 'bounds': false, draggable: true, 'icon': '/img/bus1.png' });
       markerA.setPosition(center);
     } else {
       markerA.setPosition(center);
