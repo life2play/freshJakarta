@@ -1,10 +1,19 @@
-<?php $T->addJs(array('http://maps.google.com/maps/api/js?sensor=true', 'jquery.ui.map', 'jquery.ui.map.services')) ?>
+<?php $T->addJs(array('http://maps.google.com/maps/api/js?sensor=false', 'jquery.ui.map', 'jquery.ui.map.services')) ?>
 
 <?php $T->blockStart('content') ; ?>
 
 <script language="javascript">
 var markerA = null;
 var markerB = null;
+var markerNearby = [];
+
+var ico_start   = '/img/start.png';
+var ico_stop    = '/img/finish.png';
+
+var ico_angkot  = '/img/angkot.png';
+var ico_bus     = '/img/busstop.png';
+var ico_cctv    = '/img/cctv.png';
+var ico_taxt    = '/img/taxi.png';
 
 $(function() {
   var jakarta = new google.maps.LatLng(-6.227550, 106.828308);
@@ -50,7 +59,7 @@ function setPoint(type) {
   if(type === 'a'){        
     if (markerA == null) {      
       map = $('#map_canvas').gmap('get', 'map');
-      markerA = new google.maps.Marker({ map: map, 'bounds': false, draggable: true, 'icon': '/img/bus.png' });
+      markerA = new google.maps.Marker({ map: map, 'bounds': false, draggable: true, 'icon': ico_start});
       markerA.setPosition(center);
     } else {
       markerA.setPosition(center);
@@ -60,10 +69,14 @@ function setPoint(type) {
       findLocation('a', markerA.getPosition());
     });
 
+    google.maps.event.addListener(markerA, 'click', function () {
+      getNearbyPoint();
+    });
+
   } else {
     if (markerB == null) {      
       map = $('#map_canvas').gmap('get', 'map');
-      markerB = new google.maps.Marker({ map: map, 'bounds': false, draggable: true, 'icon': '/img/cabin.png' });
+      markerB = new google.maps.Marker({ map: map, 'bounds': false, draggable: true, 'icon': ico_stop });
       markerB.setPosition(center);
     } else {
       markerB.setPosition(center);
@@ -83,9 +96,9 @@ function findLocation(type, location, marker) {
   $('#map_canvas').gmap('search', {'location': location}, function(results, status) {
     if ( status === 'OK' ) { 
       if(type === 'a')  {
-        $('#sourcepositionlabel').html( results[0].formatted_address +'&nbsp;<img src="<?php echo $T->getResourceUrl('img/bus.png') ?>">');  
+        $('#sourcepositionlabel').html( results[0].formatted_address +'<hr /><span id="ico_start"><img src="'+ico_start+'"></span><span id="ico_stop"></span>');  
       } else {
-        $('#destinationpositionlabel').html( results[0].formatted_address  +'&nbsp;<img src="<?php echo $T->getResourceUrl('img/cabin.png') ?>">');  
+        $('#destinationpositionlabel').html( results[0].formatted_address  +'<hr /><img src="'+ico_stop+'">');  
       }      
     }
   });  
@@ -93,18 +106,59 @@ function findLocation(type, location, marker) {
 
 function getNearbyPoint()
 {  
-  var point = markerA.getPosition();
-
+  var point = markerA.getPosition();  
+  
   $.ajax({
     type: "GET",
     url: "backend/api-nearby-point",
     dataType: "json",
     data: { q: JSON.stringify(point) },
     contentType: "application/json",
-    succes: function(data){
-      alert(data);
+    success: function(data) {
+      callbackDraw(data)
+    },
+    error: function (err) {
+      console.log(err);
     }
   });
+}
+
+function callbackDraw(data) {
+  $.each(data.result, function (i, r) {
+    drawNearByPoint(r);
+  });
+}
+
+function drawNearByPoint(data) {
+
+    var loc = new google.maps.LatLng(data.lat, data.lng);
+    map = $('#map_canvas').gmap('get', 'map');
+    map.setZoom(15);
+
+    var ico = (data.type === 'busway') ? ico_bus : ico_angkot;
+    var marker = new google.maps.Marker({
+      position: loc,
+      map: map,
+      'animation': google.maps.Animation.DROP,
+      'icon': ico
+    });
+
+    var button_point = '<button type="button" class="btn btn-info btn-xs" onclick="setStartPoint(\''+data.label+'\');">Set start point.</button>';
+    var infoWindow = new google.maps.InfoWindow();
+    google.maps.event.addListener(marker, 'click', function () {
+        infoWindow.setContent(
+          data.label
+          +'<br />&nbsp;<br />'+button_point
+        );
+        infoWindow.open(map, this);
+    });
+
+    markerNearby.push(marker);
+  }
+
+function setStartPoint(label) {
+  $('#ico_stop').html('<img src="'+ico_bus+'"> '+label);
+
 }
 </script>
 
@@ -155,12 +209,12 @@ function getNearbyPoint()
 
     <div class="col-md-9">
       <div class="col-md-6">
-        <div class="alert alert-info">
+        <div class="alert alert-success">
           <strong>Posisi awal:</strong> <span id="sourcepositionlabel"></span>
         </div>
       </div>
       <div class="col-md-6">
-        <div class="alert alert-success">
+        <div class="alert alert-danger">
           <strong>Posisi akhir:</strong> <span id="destinationpositionlabel"></span>
         </div>
       </div>
