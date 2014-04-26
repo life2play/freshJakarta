@@ -17,6 +17,12 @@ class RoutingConfig extends RoutingEngine {
       'rute' => array(
         self::PAGE => 'Rute/edit',
       ),
+      'getdata' => array(
+        self::PAGE => 'Home/getNearest',
+      ),
+      'apbd' => array(
+        self::PAGE => 'Home/apbd',
+      ),
 
       /* if one wants to customize their 404 page, set like this */
       self::ERROR_404_ROUTE => array(

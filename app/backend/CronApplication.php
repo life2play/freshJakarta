@@ -100,8 +100,7 @@ class CronApplication extends Application {
 
   public function getAction()
   {
-    $this->blockOutside();
-    $this->blockOutside();
+    // $this->blockOutside();
     $url = $this->request->get('url');
     $checktime = $this->request->get('checktime');
     $table = $this->request->get('table');
@@ -109,10 +108,11 @@ class CronApplication extends Application {
     $jsonData = $this->getJsonFromURL($url);
     list($halteData, $relTable) = $this->jsonToArr($jsonData, 'result');
     
-    $model = new Model($table);
-    foreach ($halteData as $row) {
-      $model->save($row);
-    }
+    var_dump($jsonData); exit;
+    // $model = new Model($table);
+    // foreach ($halteData as $row) {
+    //   $model->save($row);
+    // }
 
     // if (count($relTable) > 0) {
     //   foreach ($relTable as $k => $rows) {
