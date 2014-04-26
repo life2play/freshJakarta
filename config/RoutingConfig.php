@@ -52,11 +52,9 @@ class RoutingConfig extends RoutingEngine {
       'cron-bus-distance' => array(
         self::PAGE => 'Cron/busDistance',
       ),
-<<<<<<< HEAD
       'process-trayek-umum' => array(
         self::PAGE => 'Process/trayek',
       ),
-=======
 
       // ---- API
       'api-nearby-route' => array(
@@ -94,7 +92,6 @@ class RoutingConfig extends RoutingEngine {
         // return list of hangout places
       ),
 
->>>>>>> eb133d4962cbaf0ea7d41482bf28bb341c23f197
     );
 
     /* application path map */
