@@ -69,9 +69,12 @@ function findRoute() {
 
   $.ajax({
     type: "GET",
+    dataType: "json",
     url: "http://buswayapi.apiary.io/busway/halte/near/-6.22487/106.86669?apiKey="+api_key+"&distance=1000&page=1&per_page=10",
     success: function(data) {
-      alert(data);
+      
+      var a = JSON.parse(data);
+      alert(a);
     }    
   });
 
