@@ -23,6 +23,9 @@ class RoutingConfig extends RoutingEngine {
       'apbd' => array(
         self::PAGE => 'Home/apbd',
       ),
+      'transport' => array(
+        self::PAGE => 'Home/transport',
+      ),
 
       /* if one wants to customize their 404 page, set like this */
       self::ERROR_404_ROUTE => array(

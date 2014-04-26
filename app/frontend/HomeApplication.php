@@ -80,6 +80,11 @@ class HomeApplication extends Application {
     // return $this->render();
   }
 
+  public function transportAction()
+  {
+    return $this->render();
+  }
+
   public function apbdAction()
   {
     return $this->render();
