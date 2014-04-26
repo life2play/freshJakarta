@@ -42,7 +42,7 @@
         </div>
         <div class="navbar-collapse collapse">          
           <ul class="nav navbar-nav">
-            <?php echo $UI->navMenu(array('Home' => 'Home/index', 'Informasi Transport Umum' => 'Home/about', 'Informasi APBD' => 'Home/apbd')) ?>
+            <?php echo $UI->navMenu(array('Home' => 'Home/index', 'Informasi Transport Umum' => 'Home/transport', 'Informasi APBD' => 'Home/apbd')) ?>
           </ul>          
         </div><!--/.nav-collapse -->
       </div>
