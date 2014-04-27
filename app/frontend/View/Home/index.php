@@ -178,10 +178,18 @@ function calculateRoute() {
     type: "GET",
     url: "backend/api-get-route",
     dataType: "json",
-    data: { 'srcid' : idstart, 'dstid' : 'B510'},
+    data: { 'srcid' : idstart, 'dstid' : 'B492'},
     contentType: "application/json",
     success: function(data) {
-      callbackDrawRoutePath(data);      
+      callbackDrawRoutePath(data); 
+
+      $('#panInfo').empty().append('<strong>Rangkaian halte yg dilalui: </strong><br />');
+      $.each(data.result, function(i, j){
+        $('#panInfo').append('<br /> - '+j.haltename);
+      });
+
+      $('#panInfo').append('<br /> <strong>ETA: '+j.haltename+'</strong>');
+
     },
     error: function (err) {
       console.log(err);
