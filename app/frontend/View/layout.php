@@ -76,7 +76,19 @@
         </div>
         <div class="navbar-collapse collapse">          
           <ul class="nav navbar-nav">
-            <?php echo $UI->navMenu(array('Home' => 'Home/index', 'Informasi Transportasi Umum' => 'Home/transport')) ?>            
+            <?php echo $UI->navMenu(array('Home' => 'Home/index'
+             // ,Informasi Transportasi Umum' => 'Home/transport'
+             )) ?>            
+             <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Berbagi perjalanan <b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                <li><a href="#">Berbagi Taxi</a></li>
+                <li><a href="#">Berbagi Kendaraan</a></li>
+                <li class="divider"></li>
+                <li><a href="#">Laporan perjalanan</a></li>
+                <li><a href="#">Lihat cctv</a></li>
+              </ul>
+            </li>
           </ul>          
         </div><!--/.nav-collapse -->
       </div>
