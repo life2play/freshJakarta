@@ -20,13 +20,13 @@ class InfoApplication extends Application {
   {
     $dt = new DataTables($this->request);
     $dt->setDataSourceAction('Info/source');
-    $dt->setColumnNames(array('id', 'checktime', 'fromhalte', 'tohalte', 'avg_etatime', 'direction'));
+    $dt->setColumnNames(array('id', 'checktime', 'srchalte', 'dsthalte', 'avg_etatime', 'direction'));
     return $this->render(array('dt' => $dt), 'infoLayout');
   }
 
   public function sourceAction()
   {
-    $tablename = 'busway_eta_final';
+    $tablename = 'busway_eta_summary';
 
     $form = new TableAdapterForm($tablename, array(), array(), '?dtact=Save');         
 
@@ -49,7 +49,7 @@ class InfoApplication extends Application {
             $this->session->setFlash('Data is saved.');
           }
         }
-        return $this->redirect('backend/info');
+        return $this->redirect('backend/info-eta');
     }
     // default act
     $pager = new DataTablePager($tablename, array('id', 'checktime', 'fromhalte', 'tohalte', 'avg_etatime', 'direction'), $this->request);
