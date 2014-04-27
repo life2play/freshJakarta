@@ -96,7 +96,7 @@ function findLocation(type, location, marker) {
       if(type === 'a')  {
         $('#sourcepositionlabel').html( results[0].formatted_address +'<hr /><span id="ico_start"><img src="'+ico_start+'"></span><span id="ico_stop"></span>');  
       } else {
-        $('#destinationpositionlabel').html( results[0].formatted_address  +'<hr /><img src="'+ico_stop+'">&nbsp;<button type="button" class="btn btn-info" onclick="alert(\'x\');">Calculate route</button>');  
+        $('#destinationpositionlabel').html( results[0].formatted_address  +'<hr /><img src="'+ico_stop+'">&nbsp;<button type="button" class="btn btn-info" onclick="calculateRoute();">Calculate route</button>');  
       }      
     }
   });  
@@ -123,6 +123,13 @@ function getNearbyPoint()
   getNearbyRoute();
 }
 
+function calculateRoute() {
+  var point0 = markerA.getPosition();  
+  var pointA = markerStart.getPosition();  
+  var pointB = markerB.getPosition();  
+
+  alert('x');
+}
 function getNearbyRoute()
 {  
   // var point0 = markerA.getPosition();  
