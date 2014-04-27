@@ -15,18 +15,25 @@ class ApiApplication extends Application {
     $jsonQ = $this->request->get('q');
     $params = json_decode($jsonQ);
 
-    $query = "select lat, long as lng, '<strong>Busway</strong> Koridor: ' || koridor ||': '|| haltename as label, 'busway' as type from (select koridor, haltename, lat, long, case when ::srclat:: = b.lat and ::srclong:: = b.long then 0 else ( 6371 * acos( cos( radians(::srclat::) ) * cos( radians( b.lat ) ) * cos( radians( b.long ) - radians(::srclong::) ) + sin( radians(::srclat::) ) * sin( radians( b.lat ) ) ) )  end *1000 AS distance from busway_halte b ) src where distance <= :radius ";
+    $query = "select id, lat, long as lng, '<strong>Busway</strong> Koridor: ' || koridor ||': '|| haltename || '<br>(Distance: ' || distance || 'm)' as label, 'busway' as type, distance from (select 'B'||b.id AS id, koridor, haltename, lat, long, case when ::srclat:: = b.lat and ::srclong:: = b.long then 0 else ( 6371 * acos( cos( radians(::srclat::) ) * cos( radians( b.lat ) ) * cos( radians( b.long ) - radians(::srclong::) ) + sin( radians(::srclat::) ) * sin( radians( b.lat ) ) ) )  end *1000 AS distance from busway_halte b ) srca ";
+
+    $query  .= "UNION select id, lat, lng, label || '<br>(Distance: ' || distance || 'm)' , type, distance from (select 'A'||b.id AS id, lat, long as lng, a.nama as label, a.jenis as type, case when ::srclat:: = b.lat and ::srclong:: = b.long then 0 else ( 6371 * acos( cos( radians(::srclat::) ) * cos( radians( b.lat ) ) * cos( radians( b.long ) - radians(::srclong::) ) + sin( radians(::srclat::) ) * sin( radians( b.lat ) ) ) )  end *1000 AS distance from trayek_umum_rute b join trayek_umum a on b.trayek_umum_id = a.id  ) srcb ";
+    $query .= " WHERE distance <= :radius  ORDER BY distance desc ";
 
     $query = str_replace('::srclat::', $params->k, $query );
     $query = str_replace('::srclong::', $params->A, $query );
 
-    $query_params['radius'] = '1000';
+    $query_params['radius'] = 500;
 
     $res = $db->queryFetchAll($query, $query_params);
+
+    $arr = array();
+    $arr['result'] = array();
     if ($res) {
         $arr['result'] = $res;
-        echo json_encode($arr);
     }
+
+    echo json_encode($arr);
     exit;
   }
 
@@ -43,7 +50,7 @@ class ApiApplication extends Application {
 
     $routeQuery = "SELECT haltename, lat, long from busway_halte where koridor = :koridor";
 
-    $res = $db->queryFetchAll($query, array('radius' => 1000));
+    $res = $db->queryFetchAll($query, array('radius' => 500));
     $arr = array();
     $n = 0;
     if ($res) {
@@ -66,4 +73,63 @@ class ApiApplication extends Application {
     }
     exit;
   }
+
+  private function getTrayekId($id) 
+  {
+    $db = Singleton::acquire('\\PetakUmpet\\Database');
+
+    $q = '';
+    $params = array();
+    if (strstr($id, 'B')) {
+      $q = "SELECT b.id FROM busway_halte a JOIN busway_koridor b ON a.koridor = b.koridor WHERE a.id = ?";
+      $id = str_replace('B', '', $id);
+      $params = array($id);
+    } else {
+      $q = "SELECT b.id FROM trayek_umum_rute a JOIN trayek_umum b ON a.trayek_umum_id = b.id WHERE a.id = ?";
+      $id = str_replace('A', '', $id);
+      $params = array($id);
+    }
+    $res = $db->queryFetchOne($q, $params);
+    if ($res) {
+        return $res['id'];
+    }
+    return null;
+  }
+
+  private function getRouteById($srcTrayekId, $srcId, $dstTrayekId, $dstId)
+  {
+    $db = Singleton::acquire('\\PetakUmpet\\Database');
+    $q = "SELECT * FROM routing_paths WHERE point_a = ? AND point_b = ?";
+    $params = array($srcTrayekId, $dstTrayekId);
+
+    $res = $db->queryFetchAll($q, $params);
+    if ($res) {
+
+    } else {
+      return null;
+    }
+  }
+
+  private function getRouteInOneTrayek($srcTrayekId, $srcId, $dstTrayekId, $dstId)
+  {
+    if (strstr($srcId, 'B')) {
+      // busway
+
+    } else {
+      // non-busway
+    }
+  }
+
+  public function getRouteAction()
+  {
+    $db = Singleton::acquire('\\PetakUmpet\\Database');
+
+    $jsonQ = $this->request->get('q');
+    $params = json_decode($jsonQ);
+    
+    $srcTrayekId = $this->getTrayekId($params['srcid']);
+    $dstTrayekId = $this->getTrayekId($params['dstid']);
+
+  }
+
 }
