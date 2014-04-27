@@ -15,9 +15,8 @@
 
   <link href="<?php echo $T->getResourceUrl('res/datatables/media/css/dataTables.bootstrap.css') ?>" rel="stylesheet">
   <script src="<?php echo $T->getResourceUrl('js/jquery.min.js') ?>"></script>
+  <script src="<?php echo $T->getResourceUrl('js/bootstrap.min.js') ?>"></script>
   <script src="<?php echo $T->getResourceUrl('res/datatables/media/js/jquery.dataTables.js') ?>"></script>
-  <script src="<?php echo $T->getResourceUrl('res/datatables/extras/TableTools/media/js/ZeroClipboard.js') ?>"></script>
-  <script src="<?php echo $T->getResourceUrl('res/datatables/extras/TableTools/media/js/TableTools.js') ?>"></script>
   <script src="<?php echo $T->getResourceUrl('res/datatables/media/js/dataTables.bootstrap.js') ?>"></script>
   <script src="<?php echo $T->getResourceUrl('js/bootbox.js') ?>"></script>
 
@@ -76,7 +75,6 @@
         </section>
 
     </div>
-    <script src="<?php echo $T->getResourceUrl('js/bootstrap.min.js') ?>"></script>
     
   </body>
 </html>
