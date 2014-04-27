@@ -187,7 +187,7 @@ function calculateRoute() {
         $('#panInfo').append('<br /> - '+j.haltename);
       });
 
-      $('#panInfo').append('<br /> <strong>ETA: '+data.eta+'</strong>');
+      $('#panInfo').append('<br /> <strong>ETA: '+Math.ceil(data.eta)+' Minutes.</strong>');
 
     },
     error: function (err) {
