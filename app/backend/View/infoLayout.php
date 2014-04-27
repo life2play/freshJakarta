@@ -28,74 +28,52 @@
   <![endif]-->
   </head>
 
-  <body class="skin-blue">
+  <body>
 
     <!-- header -->
-    <header class="header">
-      <?php echo $UI->link($config->getProjectTitle(), 'Home/index', 'logo') ?>
-
-            <!-- Header Navbar: style can be found in header.less -->
-      <nav class="navbar navbar-static-top" role="navigation">
-          <!-- Sidebar toggle button-->
-        <a href="#" class="navbar-btn sidebar-toggle" data-toggle="offcanvas" role="button">
-          <span class="sr-only">Toggle navigation</span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </a>
-        <div class="navbar-right">
+    <div data-role=content>    
+    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header navbar-right">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#"><?php echo $config->getProjectTitle() ?></a>
+        </div>
+        <div class="navbar-collapse collapse">          
           <ul class="nav navbar-nav">
-              
-              <!-- User Account: style can be found in dropdown.less -->
-            <li class="dropdown user user-menu">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                <i class="glyphicon glyphicon-user"></i>
-                <span><?php if ($session->getUser()) echo $session->getUser()->getName() ?> <i class="caret"></i></span>
-              </a>
+            <?php echo $UI->navMenu(array('Home' => 'Home/index'
+             // ,Informasi Transportasi Umum' => 'Home/transport'
+             )) ?>
+             <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Berbagi perjalanan <b class="caret"></b></a>
               <ul class="dropdown-menu">
-                  <!-- User image -->
-                <li class="user-header bg-light-blue">
-                  <img src="<?php echo $T->getResourceUrl('avatar/furqon.png') ?>" class="img-circle" alt="User Image" />
-                  <p>
-                      <?php if ($session->getUser()) echo $session->getUser()->getName() ?>
-                  </p>
-                </li>
-
-                <!-- Menu Footer-->
-                <li class="user-footer">
-                  <div class="pull-left">
-                      <?php echo $UI->buttonlink('Profile', 'Logout/index', 'btn-flat') ?>
-                  </div>
-                  <div class="pull-right">
-                      <?php echo $UI->buttonlink('Sign out', 'Logout/index', 'btn-flat') ?>
-                  </div>
-                </li>
+                <li><a href="#">Berbagi Taxi</a></li>
+                <li><a href="#">Berbagi Kendaraan</a></li>
+                <li class="divider"></li>
+                <li><a href="#">Laporan perjalanan</a></li>
+                <li><a href="#">Lihat cctv</a></li>
               </ul>
             </li>
-          </ul>
-        </div>
-      </nav>
-    </header>
+            <?php echo $UI->navMenu(array('ETA Transjakarta' => 'backend/Info/eta')) ?>
+          </ul>          
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
     <!-- end header -->
 
 
         <section class="content">
-    <div class="wrapper row-offcanvas row-offcanvas-left">      
-
-    <aside class="right-side">
-        <!-- Content Header (Page header) -->
-        <section class="content-header">
-          <?php echo $T->block('content-header') ; ?>
-          <ol class="breadcrumb">
-            <?php echo $T->block('breadcrumb'); ?>
-          </ol>
-        </section>
+        
         <!-- Main content -->
-        <div class="container">
-          <?php echo $T->block('content'); ?>
-        </section><!-- /.content -->
-    </aside><!-- /.right-side -->
+        <div class="container" style="margin-top: 70px;">
+          <?php echo $T->block('content-header') ; ?>
+          <?php echo $T->block('content'); ?>          
         </div>
+        </section>
 
     </div>
     <script src="<?php echo $T->getResourceUrl('js/bootstrap.min.js') ?>"></script>
