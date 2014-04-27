@@ -55,23 +55,37 @@ $(function() {
 
 function setPoint(type) {  
   var center = $('#map_canvas').gmap('get', 'map').getCenter();
+  
 
   if(type === 'a'){        
     if (markerA == null) {      
       map = $('#map_canvas').gmap('get', 'map');
       markerA = new google.maps.Marker({ map: map, 'bounds': false, draggable: true, 'icon': ico_start});
       markerA.setPosition(center);
+
+
     } else {
       markerA.setPosition(center);
     }
 
+    var infoWindow = new google.maps.InfoWindow();
+    infoWindow.setContent(
+        'Klik icon untuk mendapat rute dan pemberhentian terdekat.'
+        );
+
     google.maps.event.addListener(markerA, 'dragend', function() {    
       findLocation('a', markerA.getPosition());
-    });
+    });    
 
     google.maps.event.addListener(markerA, 'click', function () {
-      getNearbyPoint();
+      getNearbyPoint();      
+      
+      infoWindow.close(map, this);
     });
+    infoWindow.open(map, markerA);
+
+
+    // $("#map_canvas").gmap("openInfoWindow", { "content": 'test' });
 
   } else {
     if (markerB == null) {      
@@ -274,6 +288,13 @@ function setStartPoint(label, ico, lat, lng) {
       'animation': google.maps.Animation.DROP,
       'icon': ico
     });
+
+  var infoWindow = new google.maps.InfoWindow();
+  google.maps.event.addListener(markerStart, 'click', function () {
+        infoWindow.setContent(label);
+        infoWindow.open(map, this);
+    });
+
 }
 
 function setAllMap(map) {
