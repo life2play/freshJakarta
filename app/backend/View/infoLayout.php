@@ -79,8 +79,8 @@
     <!-- end header -->
 
 
+        <section class="content">
     <div class="wrapper row-offcanvas row-offcanvas-left">      
-    <?php $T->includeFile("Home/sidebar") ?>
 
     <aside class="right-side">
         <!-- Content Header (Page header) -->
@@ -91,10 +91,11 @@
           </ol>
         </section>
         <!-- Main content -->
-        <section class="content">
+        <div class="container">
           <?php echo $T->block('content'); ?>
         </section><!-- /.content -->
     </aside><!-- /.right-side -->
+        </div>
 
     </div>
     <script src="<?php echo $T->getResourceUrl('js/bootstrap.min.js') ?>"></script>
