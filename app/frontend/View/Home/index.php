@@ -1,116 +1,225 @@
-<?php $T->addJs(array('http://maps.google.com/maps/api/js?sensor=true', 'jquery.ui.map', 'jquery.ui.map.services')) ?>
+<?php $T->addJs(array('http://maps.google.com/maps/api/js?sensor=false', 'jquery.ui.map', 'jquery.ui.map.services')) ?>
 
 <?php $T->blockStart('content') ; ?>
 
 <script language="javascript">
-var loc_x;
-var loc_a;
-var loc_b;
-var api_key = 'KnFKgQ2ZkS8bAvCRGMXA28RdVufck8BD';
+var markerA = null;
+var markerB = null;
+var markerNearby = [];
+
+var ico_start   = '/img/start.png';
+var ico_stop    = '/img/finish.png';
+
+var ico_angkot  = '/img/angkot.png';
+var ico_bus     = '/img/busstop.png';
+var ico_cctv    = '/img/cctv.png';
+var ico_taxt    = '/img/taxi.png';
 
 $(function() {
-    $("#start, #finish, #cari").blur(function() {      
-      var loc = $(this).val();
+  var jakarta = new google.maps.LatLng(-6.227550, 106.828308);
+  loc_x = jakarta;
 
-      $('#map_canvas').gmap('search', { 'address': 'indonesia, jakarta, '+loc }, function(results,isFound) {
-        if (isFound) {
-          map = $('#map_canvas').gmap('get','map');
-          map.panTo(results[0].geometry.location);
-          map.setZoom(15);
-        }
+  $('#map_canvas')
+    .gmap({'center': jakarta, 'zoom': 12})
+    .bind('init', function(event, map) { 
+      $(map).rightclick( function(event) {
+        $('#map_canvas').gmap('addMarker', {
+          'position': event.latLng, 
+          'draggable': true, 
+          'bounds': false,            
+        }, function(map, marker) {
+          findLocation(marker.getPosition(), marker);       
+        });
       });
     });
 
-    var jakarta = new google.maps.LatLng(-6.227550, 106.828308);
+  $("#cari").blur(function() {
+    var loc = $(this).val();
 
-    $('#map_canvas')
-      .gmap({'center': jakarta, 'zoom': 12})
-      .bind('init', function(event, map) { 
-        $(map).rightclick( function(event) {
-          $('#map_canvas').gmap('addMarker', {
-            'position': event.latLng, 
-            'draggable': true, 
-            'bounds': false,            
-          }, function(map, marker) {
-            findLocation(marker.getPosition(), marker);       
-          });
+    $('#map_canvas').gmap('search', { 'address': 'indonesia, jakarta, '+loc }, function(results,isFound) {
+      if (isFound) {
+        map = $('#map_canvas').gmap('get','map');
+        map.panTo(results[0].geometry.location);
+        map.setZoom(15);
+
+        $('#map_canvas').gmap('search', {'location': results[0].geometry.location }, function(results, status) {
+          if ( status === 'OK' ) {  
+            $('#sourcepositionlabel').html( results[0].formatted_address );
+          }
         });
-      });
+      }
+    });
+  });
 }); 
 
-function findLocation(location, marker) {
+function setPoint(type) {  
+
+  var center = $('#map_canvas').gmap('get', 'map').getCenter();
+
+  if(type === 'a'){        
+    if (markerA == null) {      
+      map = $('#map_canvas').gmap('get', 'map');
+      markerA = new google.maps.Marker({ map: map, 'bounds': false, draggable: true, 'icon': ico_start});
+      markerA.setPosition(center);
+    } else {
+      markerA.setPosition(center);
+    }
+
+    google.maps.event.addListener(markerA, 'dragend', function() {    
+      findLocation('a', markerA.getPosition());
+    });
+
+    google.maps.event.addListener(markerA, 'click', function () {
+      getNearbyPoint();
+    });
+
+  } else {
+    if (markerB == null) {      
+      map = $('#map_canvas').gmap('get', 'map');
+      markerB = new google.maps.Marker({ map: map, 'bounds': false, draggable: true, 'icon': ico_stop });
+      markerB.setPosition(center);
+    } else {
+      markerB.setPosition(center);
+    }
+
+    google.maps.event.addListener(markerB, 'dragend', function() {    
+      findLocation('b', markerB.getPosition());
+    });
+  }
+
+  
+
+  findLocation(type, center);
+}
+
+function findLocation(type, location, marker) {
   $('#map_canvas').gmap('search', {'location': location}, function(results, status) {
-    if ( status === 'OK' ) {      
-
-      // $.each(results[0].address_components, function(i,v) {
-      //   if ( v.types[0] == "administrative_area_level_1" || v.types[0] == "administrative_area_level_2" ) {
-      //     // $('#state'+marker.__gm_id).val(v.long_name);
-      //     // alert(v.long_name);
-      //   } else if ( v.types[0] == "country") {
-      //     // $('#country'+marker.__gm_id).val(v.long_name);
-      //     // alert(v.long_name);
-      //   }
-      // });
-
-      // marker.setTitle(results[0].formatted_address);
-      // alert(results[0].formatted_address);
-      $('#cari').val( results[0].formatted_address );
-
-      loc_x = results[0].geometry.location;      
-      // alert( loc_a ); 
-      // $('#address'+marker.__gm_id).val(results[0].formatted_address);
-      // openDialog(marker);
+    if ( status === 'OK' ) { 
+      if(type === 'a')  {
+        $('#sourcepositionlabel').html( results[0].formatted_address +'<hr /><span id="ico_start"><img src="'+ico_start+'"></span><span id="ico_stop"></span>');  
+      } else {
+        $('#destinationpositionlabel').html( results[0].formatted_address  +'<hr /><img src="'+ico_stop+'">');  
+      }      
     }
   });  
 }
 
-function findRoute() {
-  var current_loc = loc_x;
-
+function getNearbyPoint()
+{  
+  var point = markerA.getPosition();  
+  
   $.ajax({
     type: "GET",
+    url: "backend/api-nearby-point",
     dataType: "json",
-    url: "http://buswayapi.apiary.io/busway/halte/near/-6.22487/106.86669?apiKey="+api_key+"&distance=1000&page=1&per_page=10",
+    data: { q: JSON.stringify(point) },
+    contentType: "application/json",
     success: function(data) {
-      
-      var a = JSON.parse(data);
-      alert(a);
-    }    
+      callbackDraw(data)
+    },
+    error: function (err) {
+      console.log(err);
+    }
   });
+}
 
+function callbackDraw(data) {
+  $.each(data.result, function (i, r) {
+    drawNearByPoint(r);
+  });
+}
 
-  // var xhr = new XMLHttpRequest();
-  // xhr.open('GET', 'http://buswayapi.apiary.io/busway/halte/near/-6.22487/106.86669?apiKey='+api_key+'&distance=1000&page=1&per_page=10');
-  // xhr.onreadystatechange = function () {
-  //   if (this.readyState == 4) {
-  //     if (typeof cb !== "undefined") {
-  //       cb(this);
-  //     }
-  //     else {
-  //       alert('Status: '+this.status+'\nHeaders: '+JSON.stringify(this.getAllResponseHeaders())+'\nBody: '+this.responseText);
-  //     }
-  //   }
-  // };
-  // xhr.send(null);
+function drawNearByPoint(data) {
+
+    var loc = new google.maps.LatLng(data.lat, data.lng);
+    map = $('#map_canvas').gmap('get', 'map');
+    map.setZoom(15);
+
+    var ico = (data.type === 'busway') ? ico_bus : ico_angkot;
+    var marker = new google.maps.Marker({
+      position: loc,
+      map: map,
+      'animation': google.maps.Animation.DROP,
+      'icon': ico
+    });
+
+    var button_point = '<button type="button" class="btn btn-info btn-xs" onclick="setStartPoint(\''+data.label+'\');">Set start point.</button>';
+    var infoWindow = new google.maps.InfoWindow();
+    google.maps.event.addListener(marker, 'click', function () {
+        infoWindow.setContent(
+          data.label
+          +'<br />&nbsp;<br />'+button_point
+        );
+        infoWindow.open(map, this);
+    });
+
+    markerNearby.push(marker);
+  }
+
+function setStartPoint(label) {
+  $('#ico_stop').html('<img src="'+ico_bus+'"> '+label);
+
 }
 </script>
 
-<section class="container content" style="margin-top: 70px;">
-  <div class="row">
-    <div class="col-md-9">
-      <div id="map_canvas" style="width: 100%; height: 500px;"> </div>
-    </div>
-    <div class="col-md-3">      
+<section class="container content" style="margin-top: 70px;">  
+  <div class="row">    
+    
+    <div class="col-md-3" style="margin-bottom: 10px;"> 
       <div class="input-group has-success">
         <span class="input-group-addon glyphicon glyphicon-search"></span>
-        <input type="text" class="form-control" placeholder="Posisi kamu saat ini..." id="cari">        
+        <input type="text" class="form-control" placeholder="Cari lokasi di peta..." id="cari">        
+      </div>      
+      <p>&nbsp;</p>
+      <div class="btn-group btn-block">
+        <button type="button" class="btn btn-danger" data-toggle="dropdown" onClick="setPoint('a');">Set berangkat</button>
+        <button type="button" class="btn btn-danger" data-toggle="dropdown" onClick="setPoint('b');">Set berhenti</button>
       </div>
-      <p></p>
-      <div class="input-group" style="width: 100%;">
-        <button type="button" class="btn btn-primary btn-lg btn-block" onclick="findRoute()">Rute di dekatmu</button>      
-        <button type="button" class="btn btn-primary btn-lg btn-block">Cari informasi rute</button>      
+      <p>&nbsp;</p>
+      <div class="btn-group btn-block ">
+        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" style="width: 100%;">
+          Pencarian rute <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" role="menu">
+          <li><a href="#" onclick="getNearbyPoint()">Rute di dekatmu</a></li>
+          <li><a href="#">Cari informasi rute</a></li>
+          <li class="divider"></li>
+          <li><a href="#">Durasi perjalanan busway</a></li>
+        </ul>
       </div>
-    </div>
+      <div class="btn-group btn-block" style="width: 100%;">
+        <button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown" style="width: 100%;">
+          Teman perjalanan <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" role="menu">
+          <li><a href="#">Berbagi Taxi</a></li>
+          <li><a href="#">Berbagi Kendaraan</a></li>
+          <li class="divider"></li>
+          <li><a href="#">Laporan perjalanan</a></li>
+          <li><a href="#">Lihat cctv</a></li>
+        </ul>
+      </div>
+
+      <div class="btn-group btn-block">
+        <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" style="width: 100%;">
+          Hangout..
+        </button>
+      </div>
+    </div>    
+
+    <div class="col-md-9">
+      <div class="col-md-6">
+        <div class="alert alert-success">
+          <strong>Posisi awal:</strong> <span id="sourcepositionlabel"></span>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="alert alert-danger">
+          <strong>Posisi akhir:</strong> <span id="destinationpositionlabel"></span>
+        </div>
+      </div>
+      <div id="map_canvas" style="width: 100%; height: 500px;"> </div>
+    </div>    
   </div>
 </section>
 

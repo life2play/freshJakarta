@@ -27,8 +27,42 @@
   <?php $T->getJs() ?>
   </head>
 
-  <body>
-    <!-- Fixed navbar -->
+  <body>   
+    <script>
+      // var lat;
+      // var lng;
+
+      // $(function() {
+      //   // geocode();
+      //   alert(lat);
+      // });
+
+      // navigator.geolocation.getCurrentPosition (function (pos)
+      // {
+      //   var lat = pos.coords.latitude;
+      //   var lng = pos.coords.longitude;
+      //   $("#lat").text (lat);
+      //   $("#lng").text (lng);
+      // });
+
+      // function geocode() {
+      //   lat = $("#lat").val();
+      //   lng = $("#lng").val();
+
+      //   alert(lat);
+
+      //   // var location = new google.maps.LatLng(lat, lng);
+      //   // $('#map_canvas').gmap('search', {'location': location}, function(results, status) {
+      //   //   if ( status === 'OK' ) {      
+      //   //     $('#xxx').val( results[0].formatted_address );
+      //   //   }
+      //   // });  
+      // }
+    </script>
+    <input type="hidden" id="lat">
+    <input type="hidden" id="lng">
+
+    <div data-role=content>    
     <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
       <div class="container">
         <div class="navbar-header navbar-right">
@@ -42,7 +76,7 @@
         </div>
         <div class="navbar-collapse collapse">          
           <ul class="nav navbar-nav">
-            <?php echo $UI->navMenu(array('Home' => 'Home/index', 'Informasi Transport Umum' => 'Home/transport', 'Informasi APBD' => 'Home/apbd')) ?>
+            <?php echo $UI->navMenu(array('Home' => 'Home/index', 'Informasi Transportasi Umum' => 'Home/transport')) ?>            
           </ul>          
         </div><!--/.nav-collapse -->
       </div>
@@ -52,11 +86,12 @@
     <?php echo $T->block('content') ; ?>
     
     <div class="container">
-      <hr/>
+      <hr/>      
       <footer>
         Copyright &copy; <?php echo date('Y') ; ?>
       </footer>
     </div>
+
 
     
   </body>

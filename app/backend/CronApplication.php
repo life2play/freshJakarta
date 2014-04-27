@@ -98,6 +98,7 @@ class CronApplication extends Application {
     return $this->renderView('Cron/get');
   }
 
+<<<<<<< HEAD
   public function getCctvAction()
   {
     $this->blockOutside();
@@ -116,6 +117,28 @@ class CronApplication extends Application {
     }
 
     return $this->renderView('Cron/get');
+  }
+
+  public function getApbdAction()
+  {
+    // $this->blockOutside();
+    $page = $this->request->get('page');
+    $year = $this->request->get('year');
+    $url = 'http://api.hackjak.bappedajakarta.go.id/apbd?apiKey=KnFKgQ2ZkS8bAvCRGMXA28RdVufck8BD&year='.$year.'&page='.$page.'&per_page=100';
+    $table = 'apbd_collections';
+
+    $jsonData = $this->getJsonFromURL($url);
+    list($halteData, $relTable) = $this->jsonToArr($jsonData, 'result');
+    
+    $model = new Model($table);
+    foreach ($halteData as $row) {
+      $row['idproj'] = $row['id'];
+      unset($row['id']);
+
+      $model->save($row);
+    }
+
+    return $this->render();
   }
 
   public function getBuswayHalteAction()
@@ -276,7 +299,7 @@ class CronApplication extends Application {
     }
 
   }
-
+}
 
 // 0816 111 0808 (Sylviana Murni) Sylviana Murni@yahoo.com
 // 08111 77 0808
@@ -325,4 +348,3 @@ class CronApplication extends Application {
 
 // transport intersection for routing 
 // > create table transport_intersection as select 'A'||trayek_umum_id point_a, 'B'||busway_koridor_id as point_b from ( select  distinct trayek_umum_id, busway_koridor_id from intersect_angkot_busway order by trayek_umum_id, busway_koridor_id ) src union select 'A'||src_koridor_id, 'B'||dst_koridor_id from ( select distinct src_koridor_id, dst_koridor_id from intersect_busway_busway order by src_koridor_id, dst_koridor_id ) src union select 'A'||src_trayek_umum_id, 'A'||dst_trayek_umum_id from ( select  distinct src_trayek_umum_id, dst_trayek_umum_id from intersect_angkot_angkot order by src_trayek_umum_id, dst_trayek_umum_id ) src;
-}

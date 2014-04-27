@@ -3,6 +3,7 @@
 namespace frontend;
 
 use PetakUmpet\Application;
+use PetakUmpet\Database\Accessor;
 
 class HomeApplication extends Application {
 
@@ -82,7 +83,15 @@ class HomeApplication extends Application {
 
   public function transportAction()
   {
-    return $this->render();
+    $dba = new Accessor('table_fusion');
+    $rute = $dba->findAll();
+    
+    return $this->render(array('rute' => $rute));
+  }
+
+  public function gettransportAction()
+  {
+
   }
 
   public function apbdAction()
