@@ -49,6 +49,9 @@ class RoutingConfig extends RoutingEngine {
       'cron-cctv' => array(
         self::PAGE => 'Cron/getCctv',
       ),
+      'info-eta' => array(
+        self::PAGE => 'Info/eta',
+      ),
       'cron-busway-halte' => array(
         self::PAGE => 'Cron/getBuswayHalte',
       ),
