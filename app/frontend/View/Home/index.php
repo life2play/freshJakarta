@@ -7,6 +7,8 @@ var markerA = null;
 var markerB = null;
 var markerStart = null;
 var markerNearby = [];
+var idstart;
+var idend;
 
 var ico_start   = '/img/start.png';
 var ico_stop    = '/img/finish.png';
@@ -15,6 +17,10 @@ var ico_angkot  = '/img/angkot.png';
 var ico_bus     = '/img/busstop.png';
 var ico_cctv    = '/img/cctv.png';
 var ico_taxt    = '/img/taxi.png';
+
+var angkutanPath;
+
+var is_start = true;
 
 $(function() {
   var jakarta = new google.maps.LatLng(-6.227550, 106.828308);
@@ -44,16 +50,16 @@ $(function() {
         map.setZoom(15);
 
         $('#map_canvas').gmap('search', {'location': results[0].geometry.location }, function(results, status) {
-          if ( status === 'OK' ) {  
-            $('#sourcepositionlabel').html( results[0].formatted_address );
-          }
+          // if ( status === 'OK' ) {  
+          //   $('#sourcepositionlabel').html( results[0].formatted_address );
+          // }
         });
       }
     });
   });
 }); 
 
-function setPoint(type) {  
+function setPoint(type) {    
   var center = $('#map_canvas').gmap('get', 'map').getCenter();
   
 
@@ -78,7 +84,7 @@ function setPoint(type) {
     });    
 
     google.maps.event.addListener(markerA, 'click', function () {
-      getNearbyPoint();      
+      getNearbyPoint('a');      
       
       infoWindow.close(map, this);
     });
@@ -96,29 +102,50 @@ function setPoint(type) {
       markerB.setPosition(center);
     }
 
+    // var infoWindow = new google.maps.InfoWindow();
+    // infoWindow.setContent(
+    //     'Klik icon untuk mendapat pemberhentian terdekat.'
+    //     );
+
     google.maps.event.addListener(markerB, 'dragend', function() {    
       findLocation('b', markerB.getPosition());
     });
+
+    google.maps.event.addListener(markerB, 'click', function () {
+      getNearbyPoint('b');      
+      
+      // infoWindow.close(map, this);
+    });
+    // infoWindow.open(map, markerB);
   }
 
   findLocation(type, center);
 }
 
 function findLocation(type, location, marker) {
+
   $('#map_canvas').gmap('search', {'location': location}, function(results, status) {
     if ( status === 'OK' ) { 
-      if(type === 'a')  {
+      if(type == 'a' && markerA != null)  {
         $('#sourcepositionlabel').html( results[0].formatted_address +'<hr /><span id="ico_start"><img src="'+ico_start+'"></span><span id="ico_stop"></span>');  
-      } else {
+        is_start = false;
+      } else {        
         $('#destinationpositionlabel').html( results[0].formatted_address  +'<hr /><img src="'+ico_stop+'">&nbsp;<button type="button" class="btn btn-info" onclick="calculateRoute();">Calculate route</button>');  
+        $('#panInfoStop').empty();
+        $('#panInfo').append('<span id="panInfoStop"><br /><strong>Set posisi pemberhentian: </strong>'+results[0].formatted_address+'</span>');
       }      
     }
   });  
 }
 
-function getNearbyPoint()
+function getNearbyPoint(type)
 {  
-  var point = markerA.getPosition();  
+  if(type == 'b') {
+    var point = markerB.getPosition();  
+  } else {
+    var point = markerA.getPosition();  
+  }
+  
   
   $.ajax({
     type: "GET",
@@ -134,16 +161,35 @@ function getNearbyPoint()
     }
   });
 
-  getNearbyRoute();
+  if(type == 'a') {
+    getNearbyRoute();
+  }
 }
 
 function calculateRoute() {
-  var point0 = markerA.getPosition();  
-  var pointA = markerStart.getPosition();  
-  var pointB = markerB.getPosition();  
+  point0 = markerA.getPosition();  
+  pointA = markerStart.getPosition();  
+  pointB = markerB.getPosition();  
 
-  alert('x');
+  // alert(idstart+'--'+point0+'--'+pointA+'--'+pointB);
+
+
+  $.ajax({
+    type: "GET",
+    url: "backend/api-get-route",
+    dataType: "json",
+    data: { 'srcid' : idstart, 'dstid' : 'B510'},
+    contentType: "application/json",
+    success: function(data) {
+      callbackDrawRoutePath(data);      
+    },
+    error: function (err) {
+      console.log(err);
+    }
+  });
+
 }
+
 function getNearbyRoute()
 {  
   // var point0 = markerA.getPosition();  
@@ -230,6 +276,45 @@ function callbackDrawRoute(data) {
   $('#panInfo').append(listRoute);
 }
 
+function callbackDrawRoutePath(data) {  
+  map = $('#map_canvas').gmap('get', 'map');
+
+  var routeAngkutan = [];  
+  var pathAngkutan = [];  
+
+  // alert(point0);
+  var routeAngkutanPath = [];
+
+  routeAngkutanPath.push(new google.maps.LatLng(point0))   
+  routeAngkutanPath.push(new google.maps.LatLng(pointA))   
+
+  var angkutanPath = new google.maps.Polyline({
+      path: routeAngkutanPath,
+      geodesic: true,
+      strokeColor: '#abcdef',
+      strokeOpacity: 1.0,
+      strokeWeight: 5
+    });
+
+  angkutanPath.setMap(map);
+
+
+  // $.each(data.result, function (i, r) {
+
+  //   if(rute != r.name) { 
+  //     color = '#'+(Math.random()*0xFFFFFF<<0).toString(16);
+  //     listRoute += '<li style="background: '+color+';">--- '+r.name+'</li>';       
+  //   }
+  //   drawRoute(r.name, r.type, r.routes, color);
+
+    
+  //   rute = r.name;
+  // });  
+  // listRoute += '</ul>';
+
+  // $('#panInfo').append(listRoute);
+}
+
 function drawRoute(name, type, routes, color) {
     map = $('#map_canvas').gmap('get', 'map');
 
@@ -263,7 +348,7 @@ function drawNearByPoint(data) {
       'icon': ico
     });
 
-    var button_point = '<button type="button" class="btn btn-info btn-xs" onclick="setStartPoint(\''+data.label+'\', \''+ico+'\', '+data.lat+', '+data.lng+');">Set start point.</button>';
+    var button_point = '<button type="button" class="btn btn-info btn-xs" onclick="setStartPoint(\''+data.id+'\', \''+data.label+'\', \''+ico+'\', '+data.lat+', '+data.lng+');">Set start point.</button>';
     var infoWindow = new google.maps.InfoWindow();
     google.maps.event.addListener(marker, 'click', function () {
         infoWindow.setContent(
@@ -276,10 +361,10 @@ function drawNearByPoint(data) {
     markerNearby.push(marker);
   }
 
-function setStartPoint(label, ico, lat, lng) {
+function setStartPoint(id, label, ico, lat, lng) {
+
   $('#ico_stop').html('<img src="'+ico+'"> '+label);
   deleteOtherNearbyMarkers();
-
   
   var loc = new google.maps.LatLng(lat, lng);
   markerStart = new google.maps.Marker({
@@ -289,11 +374,16 @@ function setStartPoint(label, ico, lat, lng) {
       'icon': ico
     });
 
+  idstart = id;
+
   var infoWindow = new google.maps.InfoWindow();
   google.maps.event.addListener(markerStart, 'click', function () {
-        infoWindow.setContent(label);
-        infoWindow.open(map, this);
+        infoWindow.setContent(label+'--'+id);
+        infoWindow.open(map, this);        
     });
+
+  $('#panInfo').empty().html('<strong>Set posisi keberangkatan: </strong>'+label);
+  // angkutanPath.setMap(null);
 
 }
 
