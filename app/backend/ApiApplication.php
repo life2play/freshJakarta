@@ -186,11 +186,19 @@ class ApiApplication extends Application {
 
         $q = "select avg(a.avg_etatime) from busway_eta_final a join busway_halte b on a.fromhalte = b.halteid and b.id = ? join busway_halte c on a.tohalte = c.halteid and c.id = ?";
 
-        $p = array(str_replace('B','', $srcId), str_replace('B','', $dstId));
+          $sid = str_replace('B','', $srcId);
+          $did = str_replace('B','', $dstId);
+
+          $bigId = $did; $smallId = $sid;
+          if ((int) $sid > (int) $did) {
+            $bigId = $sid; $smallId = $did;
+          }
+
+        $p = array($smallId, $bigId);
 
         $eta = $db->queryFetchOne($q, $p);
         $arr['eta'] = $eta;
-        
+
         echo json_encode($arr);
         exit;
     } else {
