@@ -91,13 +91,14 @@ class ApiApplication extends Application {
     }
     $res = $db->queryFetchOne($q, $params);
     if ($res) {
-        return $res['id'];
+        return $res;
     }
     return null;
   }
 
   private function traverseRoute($srcTrayekId, $srcId, $dstTrayekId, $dstId)
   {
+    
   }
 
   private function getRoutePath($srcTrayekId, $srcId, $dstTrayekId, $dstId)
@@ -131,7 +132,7 @@ class ApiApplication extends Application {
         $bigId = $sid; $smallId = $did;
       }
 
-      $q = "select 'Koridor-'||b.koridor|| ': ' || b.shname || '-' || b.fhname AS label, a.lat, a.long as lng, a.haltename  from busway_halte a join busway_koridor b on a.koridor = b.koridor WHERE koridor = ? AND halteid::integer >= ? AND halteid::integer <= ?";
+      $q = "select 'Koridor-'||b.koridor|| ': ' || b.shname || '-' || b.fhname AS label, a.lat, a.long as lng, a.haltename  from busway_halte a join busway_koridor b on a.koridor = b.koridor WHERE b.id = ? AND a.id >= ? AND a.id <= ?";
       $params = array($srcTrayekId, $smallId, $bigId);
 
       $res = $db->queryFetchAll($q, $params);
@@ -166,21 +167,20 @@ class ApiApplication extends Application {
     $jsonQ = $this->request->get('q');
     $params = json_decode($jsonQ);
     
-    $srcId = $params['srcid'];
-    $dstId = $params['dstid'];
+    $srcId = $this->request->get('srcid');
+    $dstId = $this->request->get('dstid');
 
-    $srclat = $params['srclat'];
-    $srclong = $params['srclong'];
-    $dstlat = $params['dstlat'];
-    $dstlong = $params['dstlong'];
+    $srclat = $this->request->get('srclat');
+    $srclong = $this->request->get('srclong');
+    $dstlat = $this->request->get('dstlat');
+    $dstlong = $this->request->get('dstlong');
 
     $srcTrayekId = $this->getTrayekId($srcId);
     $dstTrayekId = $this->getTrayekId($dstId);
 
-
     if ($srcTrayekId == $dstTrayekId) {
         $type = 'A';
-        if (strstr('B', $srcId)) {
+        if (strstr($srcId, 'B')) {
             $type = 'B';
         }
         $arr['result'] = $this->getRouteInOneTrayek($srcTrayekId, $srcId, $dstId, $type);
