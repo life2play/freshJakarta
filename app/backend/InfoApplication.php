@@ -20,7 +20,7 @@ class InfoApplication extends Application {
   {
     $dt = new DataTables($this->request);
     $dt->setDataSourceAction('Info/source');
-    $dt->setColumnNames(array('id', 'checktime', 'direction', 'koridorno', 'fromhalte', 'tohalte', 'avg_etatime'));
+    $dt->setColumnNames(array('id', 'checktime', 'fromhalte', 'tohalte', 'avg_etatime', 'direction'));
     return $this->render(array('dt' => $dt), 'infoLayout');
   }
 
@@ -52,7 +52,7 @@ class InfoApplication extends Application {
         return $this->redirect('backend/info');
     }
     // default act
-    $pager = new DataTablePager($tablename, array('id', 'checktime', 'direction', 'koridorno', 'fromhalte', 'tohalte', 'avg_etatime'), $this->request);
+    $pager = new DataTablePager($tablename, array('id', 'checktime', 'fromhalte', 'tohalte', 'avg_etatime', 'direction'), $this->request);
     return (string) $pager;
 
   }
