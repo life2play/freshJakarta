@@ -89,7 +89,7 @@
                 <li><a href="#">Lihat cctv</a></li>
               </ul>
             </li>
-            <?php echo $UI->navMenu(array('Hangout' => '#')) ?>
+            <?php echo $UI->navMenu(array('ETA Transjakarta' => 'backend/info-eta')) ?>
           </ul>          
         </div><!--/.nav-collapse -->
       </div>

@@ -173,7 +173,6 @@ function calculateRoute() {
 
   // alert(idstart+'--'+point0+'--'+pointA+'--'+pointB);
 
-
   $.ajax({
     type: "GET",
     url: "backend/api-get-route",
@@ -188,7 +187,7 @@ function calculateRoute() {
         $('#panInfo').append('<br /> - '+j.haltename);
       });
 
-      $('#panInfo').append('<br /> <strong>ETA: '+j.haltename+'</strong>');
+      $('#panInfo').append('<br /> <strong>ETA: '+data.eta+'</strong>');
 
     },
     error: function (err) {
@@ -357,11 +356,12 @@ function drawNearByPoint(data) {
     });
 
     var button_point = '<button type="button" class="btn btn-info btn-xs" onclick="setStartPoint(\''+data.id+'\', \''+data.label+'\', \''+ico+'\', '+data.lat+', '+data.lng+');">Set start point.</button>';
+    var button_cam = '<button class="btn btn-primary btn-xs" data-toggle="modal" data-target="#myModal">Open cctv</button>';
     var infoWindow = new google.maps.InfoWindow();
     google.maps.event.addListener(marker, 'click', function () {
         infoWindow.setContent(
           data.label
-          +'<br />&nbsp;<br />'+button_point
+          +'<br />&nbsp;<br />'+button_point+'&nbsp;'+button_cam
         );
         infoWindow.open(map, this);
     });
@@ -385,8 +385,9 @@ function setStartPoint(id, label, ico, lat, lng) {
   idstart = id;
 
   var infoWindow = new google.maps.InfoWindow();
+  var button_cam = '<button class="btn btn-primary btn-xs" data-toggle="modal" data-target="#myModal">Open cctv</button>';
   google.maps.event.addListener(markerStart, 'click', function () {
-        infoWindow.setContent(label+'--'+id);
+        infoWindow.setContent('<strong>'+label+'</strong><br />'+button_cam);
         infoWindow.open(map, this);        
     });
 
@@ -492,6 +493,23 @@ function deleteOtherNearbyMarkers() {
   </div>
 </section>
 
+
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="myModalLabel">CCTV</h4>
+      </div>
+      <div class="modal-body">
+        <iframe src="http://itsjakarta.com/its/camera/?ip=10.1.65.21" style="width: 500px; height: 450px; padding: 20px; margin: 0 auto;" border="0"></iframe>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
 <?php $T->blockEnd('content') ; ?>
 
 <!-- 08161110808, 08111770808 <sylvianamurni@yahoo.com> -->
