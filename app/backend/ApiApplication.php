@@ -183,6 +183,14 @@ class ApiApplication extends Application {
             $type = 'B';
         }
         $arr['result'] = $this->getRouteInOneTrayek($srcTrayekId, $srcId, $dstId, $type);
+
+        $q = "select avg(a.avg_etatime) from busway_eta_final a join busway_halte b on a.fromhalte = b.halteid and b.id = ? join busway_halte c on a.tohalte = c.halteid and c.id = ?";
+
+        $p = array(str_replace('B','', $srcId), str_replace('B','', $dstId));
+
+        $eta = $db->queryFetchOne($q, $p);
+        $arr['eta'] = $eta;
+        
         echo json_encode($arr);
         exit;
     } else {
