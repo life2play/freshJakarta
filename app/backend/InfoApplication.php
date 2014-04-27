@@ -52,7 +52,7 @@ class InfoApplication extends Application {
         return $this->redirect('backend/info-eta');
     }
     // default act
-    $pager = new DataTablePager($tablename, array('id', 'checktime', 'fromhalte', 'tohalte', 'avg_etatime', 'direction'), $this->request);
+    $pager = new DataTablePager($tablename, array('id', 'checktime', 'srchalte', 'dsthalte', 'avg_etatime', 'direction'), $this->request);
     return (string) $pager;
 
   }
