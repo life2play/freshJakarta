@@ -104,7 +104,6 @@ class ApiApplication extends Application {
 
     $res = $db->queryFetchAll($q, $params);
     if ($res) {
-
     } else {
       return null;
     }
@@ -114,10 +113,14 @@ class ApiApplication extends Application {
   {
     if (strstr($srcId, 'B')) {
       // busway
-
     } else {
       // non-busway
     }
+  }
+
+  private function traverseRoute($id) 
+  {
+
   }
 
   public function getRouteAction()
