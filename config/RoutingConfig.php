@@ -46,11 +46,17 @@ class RoutingConfig extends RoutingEngine {
       'cron-geteta' => array(
         self::PAGE => 'Cron/eta',
       ),
+      'cron-cctv' => array(
+        self::PAGE => 'Cron/getCctv',
+      ),
       'cron-busway-halte' => array(
         self::PAGE => 'Cron/getBuswayHalte',
       ),
       'cron-bus-distance' => array(
         self::PAGE => 'Cron/busDistance',
+      ),
+      'cron-halte-distance' => array(
+        self::PAGE => 'Cron/halteDistance',
       ),
       'process-trayek-umum' => array(
         self::PAGE => 'Process/trayek',
@@ -76,6 +82,11 @@ class RoutingConfig extends RoutingEngine {
         /* return
           array(
             route1, transit, ... routeN            
+          array(
+            trayek_name,
+            trayek_type,
+            trayek_routes => array(0 => (lat, lng), 1=>(lat,lng))
+            )
           );
         */
       ),
