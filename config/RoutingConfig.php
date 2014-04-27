@@ -52,6 +52,9 @@ class RoutingConfig extends RoutingEngine {
       'info-eta' => array(
         self::PAGE => 'Info/eta',
       ),
+      'info-source' => array(
+        self::PAGE => 'Info/source',
+      ),
       'cron-busway-halte' => array(
         self::PAGE => 'Cron/getBuswayHalte',
       ),
