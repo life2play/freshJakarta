@@ -78,7 +78,7 @@
           <ul class="nav navbar-nav">
             <?php echo $UI->navMenu(array('Home' => 'Home/index'
              // ,Informasi Transportasi Umum' => 'Home/transport'
-             )) ?>            
+             )) ?>
              <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">Berbagi perjalanan <b class="caret"></b></a>
               <ul class="dropdown-menu">
@@ -89,6 +89,7 @@
                 <li><a href="#">Lihat cctv</a></li>
               </ul>
             </li>
+            <?php echo $UI->navMenu(array('Hangout' => '#')) ?>
           </ul>          
         </div><!--/.nav-collapse -->
       </div>
