@@ -98,7 +98,6 @@ class ApiApplication extends Application {
 
   private function traverseRoute($srcTrayekId, $srcId, $dstTrayekId, $dstId)
   {
-    
   }
 
   private function getRoutePath($srcTrayekId, $srcId, $dstTrayekId, $dstId)
@@ -186,8 +185,32 @@ class ApiApplication extends Application {
         $arr['result'] = $this->getRouteInOneTrayek($srcTrayekId, $srcId, $dstId, $type);
         echo json_encode($arr);
         exit;
+    } else {
+        $dstType = 'A';
+        if (strstr($dstId, 'B')) {
+            $dstType = 'B';
+        }
+        $arr['result'] = $this->getBuswayToBuswayRoute($srcTrayekId, $srcId, $dstTrayekId, $dstId);
+        echo json_encode($arr);
+        exit;
     }
-    return $this->getRoutePath($srcTrayekId, $srcId, $dstTrayekId, $dstId);
+    return array();
+  }
+
+  public function getCctvAction()
+  {
+    $db = Singleton::acquire('\\PetakUmpet\\Database');
+
+    $q = "SELECT urladdress, latitude, longitude FROM layer_cctv" ;
+
+    $res = $db->queryFetchAll($q);
+
+    $arr['result'] = array();
+    if ($res) {
+        $arr['result'] = $res;
+    }
+    echo json_encode($arr);
+    exit;
   }
 
 }
