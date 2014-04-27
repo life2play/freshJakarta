@@ -1,3 +1,13 @@
+CREATE TABLE busway_koridor (
+  id serial,
+  koridor varchar(10),
+  starthalte varchar(10),
+  finishhalte varchar(10),
+  shname varchar(100),
+  fhname varchar(100),
+  PRIMARY KEY (id)
+);
+
 CREATE TABLE busway_halte (
   id serial,
   koridor varchar(10),
@@ -5,6 +15,19 @@ CREATE TABLE busway_halte (
   haltename varchar(100),
   lat decimal(11,6),
   long decimal(11,6),
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE busway_halte_real_distance (
+  id serial,
+  koridor varchar(10),
+  ahalteid varchar(10),
+  bhalteid varchar(10),
+  alat decimal(11,6),
+  along decimal(11,6),
+  blat decimal(11,6),
+  blong decimal(11,6),
+  distance double precision,
   PRIMARY KEY (id)
 );
 
@@ -101,7 +124,7 @@ CREATE TABLE rute_berangkat (
   trayek_id integer,
   halte varchar(50),
   PRIMARY KEY (id),
-  FOREIGN KEY (trayek_id) REFERENCES trayek(id)
+  FOREIGN KEY (trayek_id) REFERENCES trayek_opendata(id)
 );
 
 CREATE TABLE rute_kembali (
@@ -109,7 +132,7 @@ CREATE TABLE rute_kembali (
   trayek_id integer,
   halte varchar(50),
   PRIMARY KEY (id),
-  FOREIGN KEY (trayek_id) REFERENCES trayek(id)
+  FOREIGN KEY (trayek_id) REFERENCES trayek_opendata(id)
 );
 
 CREATE TABLE trayek_umum (
@@ -141,36 +164,46 @@ CREATE TABLE trayek_umum_rute_processed (
 
 CREATE TABLE intersect_angkot_busway (
   id serial,
+  trayek_umum_id integer,
   trayek_umum_rute_id integer,
   angkotlat decimal(11,6),
   angkotlong decimal(11,6),
+  busway_koridor_id integer,
   busway_halte_id integer,
   buswaylat decimal(11,6),
   buswaylong decimal(11,6),
   distance double precision,
   PRIMARY KEY (id),
+  FOREIGN KEY (trayek_umum_id) REFERENCES trayek_umum (id),
   FOREIGN KEY (trayek_umum_rute_id) REFERENCES trayek_umum_rute (id),
+  FOREIGN KEY (busway_koridor_id) REFERENCES busway_koridor (id),
   FOREIGN KEY (busway_halte_id) REFERENCES busway_halte (id)
 );
 
 CREATE TABLE intersect_busway_busway (
   id serial,
-  src_busway_halte_id integer,
-  dst_busway_halte_id integer,
+  src_koridor_id integer,
+  src_halte_id integer,
+  dst_koridor_id integer,
+  dst_halte_id integer,
   alat decimal(11,6),
   along decimal(11,6),
   blat decimal(11,6),
   blong decimal(11,6),
   distance double precision,
   PRIMARY KEY (id),
-  FOREIGN KEY (src_busway_halte_id) REFERENCES busway_halte (id),
-  FOREIGN KEY (dst_busway_halte_id) REFERENCES busway_halte (id)
+  FOREIGN KEY (src_koridor_id) REFERENCES busway_koridor (id),
+  FOREIGN KEY (src_halte_id) REFERENCES busway_halte (id),
+  FOREIGN KEY (dst_koridor_id) REFERENCES busway_koridor (id),
+  FOREIGN KEY (dst_halte_id) REFERENCES busway_halte (id)
 );
 
 CREATE TABLE intersect_angkot_angkot (
   id serial,
   src_trayek_umum_id integer,
+  src_trayek_umum_rute_id integer,
   dst_trayek_umum_id integer,
+  dst_trayek_umum_rute_id integer,
   alat decimal(11,6),
   along decimal(11,6),
   blat decimal(11,6),
@@ -178,7 +211,20 @@ CREATE TABLE intersect_angkot_angkot (
   distance double precision,
   PRIMARY KEY (id),
   FOREIGN KEY (src_trayek_umum_id) REFERENCES trayek_umum (id),
-  FOREIGN KEY (dst_trayek_umum_id) REFERENCES trayek_umum (id)
+  FOREIGN KEY (src_trayek_umum_rute_id) REFERENCES trayek_umum_rute (id),
+  FOREIGN KEY (dst_trayek_umum_id) REFERENCES trayek_umum (id),
+  FOREIGN KEY (dst_trayek_umum_rute_id) REFERENCES trayek_umum_rute (id)
+);
+
+CREATE TABLE routing_paths (
+  id serial,
+  path_id integer,
+  step integer,
+  point_a varchar(30),
+  point_b varchar(30),
+  path_a varchar(30),
+  path_b varchar(30),
+  PRIMARY KEY(id)
 );
 
 CREATE TABLE layer_theatre (
@@ -192,9 +238,12 @@ CREATE TABLE layer_theatre (
 
 CREATE TABLE layer_cctv (
   id serial,
-  nama varchar(100),
+  cctv_name varchar(255),
   urladdress varchar(255),
-  lat decimal(11,6),
-  long decimal(11,6),
+  latitude decimal(11,6),
+  longitude decimal(11,6),
+  full_path text,
+  flag integer,
+  info_date timestamp,
   PRIMARY KEY (id)
 );
